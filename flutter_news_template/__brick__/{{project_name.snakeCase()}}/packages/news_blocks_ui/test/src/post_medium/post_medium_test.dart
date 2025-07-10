@@ -5,18 +5,26 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail_image_network/mocktail_image_network.dart';
 import 'package:news_blocks/news_blocks.dart';
 import 'package:news_blocks_ui/news_blocks_ui.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import '../../helpers/helpers.dart';
 
 void main() {
   setUpAll(() {
-    setUpTolerantComparator();
+    // Initialize FFI
+    sqfliteFfiInit();
+    // Change the default factory
+    databaseFactory = databaseFactoryFfi;
+
+    setUpTolerantComparator(
+      'test/src/post_medium/post_medium_test.dart',
+    );
     setUpMockPathProvider();
   });
 
   group('PostMedium', () {
     const id = '82c49bf1-946d-4920-a801-302291f367b5';
-    const category = PostCategory.sports;
+    const category = Category(id: 'sports', name: 'Sports');
     const author = 'Tom Dierberger';
     final publishedAt = DateTime(2022, 3, 10);
     const imageUrl =
@@ -31,7 +39,7 @@ void main() {
     testWidgets('renders correctly overlaid layout', (tester) async {
       final postMediumBlock = PostMediumBlock(
         id: id,
-        category: category,
+        categoryId: category.id,
         author: author,
         publishedAt: publishedAt,
         imageUrl: imageUrl,
@@ -55,7 +63,7 @@ void main() {
     testWidgets('renders correctly description layout', (tester) async {
       final postMediumBlock = PostMediumBlock(
         id: id,
-        category: category,
+        categoryId: category.id,
         author: author,
         publishedAt: publishedAt,
         imageUrl: imageUrl,
@@ -80,7 +88,7 @@ void main() {
       final actions = <BlockAction>[];
       final postMediumBlock = PostMediumBlock(
         id: id,
-        category: category,
+        categoryId: category.id,
         author: author,
         publishedAt: publishedAt,
         imageUrl: imageUrl,

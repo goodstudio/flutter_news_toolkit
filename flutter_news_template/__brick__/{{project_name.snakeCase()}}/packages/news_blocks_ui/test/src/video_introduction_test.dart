@@ -11,7 +11,7 @@ import 'package:video_player_platform_interface/video_player_platform_interface.
 import '../helpers/helpers.dart';
 
 void main() {
-  const category = PostCategory.technology;
+  const category = Category(id: 'technology', name: 'Technology');
   const videoUrl =
       'https://cdn.vox-cdn.com/thumbor/OTpmptgr7XcTVAJ27UBvIxl0vrg='
       '/0x146:2040x1214/fit-in/1200x630/cdn.vox-cdn.com/uploads/chorus_asset'
@@ -24,13 +24,15 @@ void main() {
       () {
         final fakeVideoPlayerPlatform = FakeVideoPlayerPlatform();
         VideoPlayerPlatform.instance = fakeVideoPlayerPlatform;
-        setUpTolerantComparator();
+        setUpTolerantComparator(
+          'test/src/video_introduction_test.dart',
+        );
       },
     );
 
     testWidgets('renders correctly', (tester) async {
       final technologyVideoIntroduction = VideoIntroductionBlock(
-        category: category,
+        categoryId: category.id,
         videoUrl: videoUrl,
         title: title,
       );
@@ -40,7 +42,10 @@ void main() {
           SingleChildScrollView(
             child: Column(
               children: [
-                VideoIntroduction(block: technologyVideoIntroduction),
+                VideoIntroduction(
+                  block: technologyVideoIntroduction,
+                  categoryName: category.name,
+                ),
               ],
             ),
           ),

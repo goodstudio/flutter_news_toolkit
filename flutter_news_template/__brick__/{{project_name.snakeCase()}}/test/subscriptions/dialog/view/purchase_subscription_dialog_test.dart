@@ -126,7 +126,7 @@ void main() {
 
     testWidgets('closes dialog on close button tap', (tester) async {
       final navigator = MockNavigator();
-
+      when(navigator.canPop).thenAnswer((_) => true);
       when(navigator.pop).thenAnswer((_) async => true);
 
       await tester.pumpApp(
@@ -153,6 +153,7 @@ void main() {
       final navigator = MockNavigator();
       final analyticsBloc = MockAnalyticsBloc();
 
+      when(navigator.canPop).thenAnswer((_) => true);
       when(navigator.maybePop<void>).thenAnswer((_) async => true);
 
       when(
@@ -171,8 +172,9 @@ void main() {
         userRepository: userRepository,
       );
 
-      await tester.pump();
       expect(find.byType(PurchaseCompletedDialog), findsOneWidget);
+
+      await tester.pump(const Duration(seconds: 3));
 
       verify(
         () => analyticsBloc.add(
