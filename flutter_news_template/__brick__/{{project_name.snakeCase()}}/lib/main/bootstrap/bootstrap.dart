@@ -15,6 +15,10 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 typedef AppBuilder = Future<Widget> Function(
+  // Ignore, as we currently only use dynamic links for e-mail login.
+  // e-mail login will be replaced but not deprecated.
+  // source:https://firebase.google.com/support/dynamic-links-faq#im_currently_using_or_need_to_use_dynamic_links_for_email_link_authentication_in_firebase_authentication_will_this_feature_continue_to_work_after_the_sunset
+  // ignore: deprecated_member_use
   FirebaseDynamicLinks firebaseDynamicLinks,
   FirebaseMessaging firebaseMessaging,
   SharedPreferences sharedPreferences,
@@ -22,31 +26,34 @@ typedef AppBuilder = Future<Widget> Function(
 );
 
 Future<void> bootstrap(AppBuilder builder) async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  final analyticsRepository = AnalyticsRepository(FirebaseAnalytics.instance);
-  final blocObserver = AppBlocObserver(
-    analyticsRepository: analyticsRepository,
-  );
-  Bloc.observer = blocObserver;
-  HydratedBloc.storage = await HydratedStorage.build(
-    storageDirectory: await getApplicationSupportDirectory(),
-  );
-
-  if (kDebugMode) {
-    await HydratedBloc.storage.clear();
-  }
-
-  await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
-  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
-
-  final sharedPreferences = await SharedPreferences.getInstance();
-
   await runZonedGuarded<Future<void>>(
     () async {
+      WidgetsFlutterBinding.ensureInitialized();
+
+      await Firebase.initializeApp();
+      final analyticsRepository =
+          AnalyticsRepository(FirebaseAnalytics.instance);
+      final blocObserver = AppBlocObserver(
+        analyticsRepository: analyticsRepository,
+      );
+      Bloc.observer = blocObserver;
+      HydratedBloc.storage = await HydratedStorage.build(
+        storageDirectory: await getApplicationSupportDirectory(),
+      );
+
+      if (kDebugMode) {
+        await HydratedBloc.storage.clear();
+      }
+
+      await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+      FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
+
+      final sharedPreferences = await SharedPreferences.getInstance();
+
       unawaited(MobileAds.instance.initialize());
       runApp(
         await builder(
+          // ignore: deprecated_member_use
           FirebaseDynamicLinks.instance,
           FirebaseMessaging.instance,
           sharedPreferences,
@@ -54,6 +61,6 @@ Future<void> bootstrap(AppBuilder builder) async {
         ),
       );
     },
-    FirebaseCrashlytics.instance.recordError,
+    (_, __) {},
   );
 }

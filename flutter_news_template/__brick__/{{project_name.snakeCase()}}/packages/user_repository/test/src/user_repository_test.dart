@@ -14,7 +14,7 @@ class MockAuthenticationClient extends Mock implements AuthenticationClient {}
 
 class MockPackageInfoClient extends Mock implements PackageInfoClient {}
 
-class MockDeepLinkClient extends Mock implements DeepLinkClient {}
+class MockDeepLinkService extends Mock implements DeepLinkService {}
 
 class MockUserStorage extends Mock implements UserStorage {}
 
@@ -45,6 +45,8 @@ class FakeLogInWithFacebookCanceled extends Fake
 
 class FakeLogOutFailure extends Fake implements LogOutFailure {}
 
+class FakeDeleteAccountFailure extends Fake implements DeleteAccountFailure {}
+
 class FakeSendLoginEmailLinkFailure extends Fake
     implements SendLoginEmailLinkFailure {}
 
@@ -55,7 +57,7 @@ void main() {
   group('UserRepository', () {
     late AuthenticationClient authenticationClient;
     late PackageInfoClient packageInfoClient;
-    late DeepLinkClient deepLinkClient;
+    late DeepLinkService deepLinkService;
     late UserStorage storage;
     late StreamController<Uri> deepLinkClientController;
     late UserRepository userRepository;
@@ -64,19 +66,19 @@ void main() {
     setUp(() {
       authenticationClient = MockAuthenticationClient();
       packageInfoClient = MockPackageInfoClient();
-      deepLinkClient = MockDeepLinkClient();
+      deepLinkService = MockDeepLinkService();
       storage = MockUserStorage();
       deepLinkClientController = StreamController<Uri>.broadcast();
       apiClient = Mock{{project_name.pascalCase()}}ApiClient();
 
-      when(() => deepLinkClient.deepLinkStream)
+      when(() => deepLinkService.deepLinkStream)
           .thenAnswer((_) => deepLinkClientController.stream);
 
       userRepository = UserRepository(
         apiClient: apiClient,
         authenticationClient: authenticationClient,
         packageInfoClient: packageInfoClient,
-        deepLinkClient: deepLinkClient,
+        deepLinkService: deepLinkService,
         storage: storage,
       );
     });
@@ -419,6 +421,29 @@ void main() {
       });
     });
 
+    group('deleteAccount', () {
+      test('calls logOut on AuthenticationClient', () async {
+        when(() => authenticationClient.deleteAccount())
+            .thenAnswer((_) async {});
+        await userRepository.deleteAccount();
+        verify(() => authenticationClient.deleteAccount()).called(1);
+      });
+
+      test('rethrows DeleteAccountFailure', () async {
+        final exception = FakeDeleteAccountFailure();
+        when(() => authenticationClient.deleteAccount()).thenThrow(exception);
+        expect(() => userRepository.deleteAccount(), throwsA(exception));
+      });
+
+      test('throws DeleteAccountFailure on generic exception', () async {
+        when(() => authenticationClient.deleteAccount()).thenThrow(Exception());
+        expect(
+          () => userRepository.deleteAccount(),
+          throwsA(isA<DeleteAccountFailure>()),
+        );
+      });
+    });
+
     group('UserFailure', () {
       final error = Exception('errorMessage');
 
@@ -443,7 +468,7 @@ void main() {
           apiClient: apiClient,
           authenticationClient: authenticationClient,
           packageInfoClient: packageInfoClient,
-          deepLinkClient: deepLinkClient,
+          deepLinkService: deepLinkService,
           storage: storage,
         ).fetchAppOpenedCount();
         expect(result, 1);
@@ -459,7 +484,7 @@ void main() {
             apiClient: apiClient,
             authenticationClient: authenticationClient,
             packageInfoClient: packageInfoClient,
-            deepLinkClient: deepLinkClient,
+            deepLinkService: deepLinkService,
             storage: storage,
           ).fetchAppOpenedCount(),
           throwsA(isA<FetchAppOpenedCountFailure>()),
@@ -480,7 +505,7 @@ void main() {
             apiClient: apiClient,
             authenticationClient: authenticationClient,
             packageInfoClient: packageInfoClient,
-            deepLinkClient: deepLinkClient,
+            deepLinkService: deepLinkService,
             storage: storage,
           ).incrementAppOpenedCount(),
           completes,
@@ -499,7 +524,7 @@ void main() {
             apiClient: apiClient,
             authenticationClient: authenticationClient,
             packageInfoClient: packageInfoClient,
-            deepLinkClient: deepLinkClient,
+            deepLinkService: deepLinkService,
             storage: storage,
           ).incrementAppOpenedCount(),
           throwsA(isA<IncrementAppOpenedCountFailure>()),

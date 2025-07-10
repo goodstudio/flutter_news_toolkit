@@ -5,17 +5,24 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail_image_network/mocktail_image_network.dart';
 import 'package:news_blocks/news_blocks.dart';
 import 'package:news_blocks_ui/news_blocks_ui.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import '../helpers/helpers.dart';
 
 void main() {
   group('PostSmall', () {
     setUpAll(() {
-      setUpTolerantComparator();
+      // Initialize FFI
+      sqfliteFfiInit();
+      // Change the default factory
+      databaseFactory = databaseFactoryFfi;
+
+      setUpTolerantComparator('test/src/post_small_test.dart');
       setUpMockPathProvider();
     });
 
     testWidgets('renders correctly without image', (tester) async {
+      const category = Category(id: 'technology', name: 'Technology');
       await mockNetworkImages(() async {
         await tester.pumpApp(
           Column(
@@ -23,7 +30,7 @@ void main() {
               PostSmall(
                 block: PostSmallBlock(
                   id: 'id',
-                  category: PostCategory.technology,
+                  categoryId: category.id,
                   publishedAt: DateTime(2022, 03, 12),
                   title: 'Nvidia and AMD GPUs are '
                       'returning to shelves and prices '
@@ -42,6 +49,7 @@ void main() {
     });
 
     testWidgets('renders correctly with image', (tester) async {
+      const category = Category(id: 'technology', name: 'Technology');
       await mockNetworkImages(() async {
         await tester.pumpApp(
           Column(
@@ -49,7 +57,7 @@ void main() {
               PostSmall(
                 block: PostSmallBlock(
                   id: 'id',
-                  category: PostCategory.technology,
+                  categoryId: category.id,
                   publishedAt: DateTime(2022, 03, 12),
                   title: 'Nvidia and AMD GPUs are '
                       'returning to shelves and prices '
@@ -72,6 +80,7 @@ void main() {
     testWidgets('onPressed is called with action when tapped', (tester) async {
       final action = NavigateToArticleAction(articleId: 'id');
       final actions = <BlockAction>[];
+      const category = Category(id: 'technology', name: 'Technology');
 
       await mockNetworkImages(() async {
         await tester.pumpApp(
@@ -80,7 +89,7 @@ void main() {
               PostSmall(
                 block: PostSmallBlock(
                   id: 'id',
-                  category: PostCategory.technology,
+                  categoryId: category.id,
                   publishedAt: DateTime(2022, 03, 12),
                   title:
                       'Nvidia and AMD GPUs are returning to shelves and prices '

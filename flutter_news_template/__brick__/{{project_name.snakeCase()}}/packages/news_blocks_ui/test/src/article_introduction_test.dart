@@ -7,7 +7,7 @@ import 'package:news_blocks_ui/news_blocks_ui.dart';
 import '../helpers/helpers.dart';
 
 void main() {
-  const category = PostCategory.technology;
+  const category = Category(id: 'technology', name: 'Technology');
   const author = 'Sean Hollister';
   final publishedAt = DateTime(2022, 3, 9);
   const imageUrl =
@@ -20,10 +20,12 @@ void main() {
   const premiumText = 'Subscriber Exclusive';
 
   group('ArticleIntroduction', () {
-    setUpAll(setUpTolerantComparator);
+    setUpAll(
+      () => setUpTolerantComparator('test/src/article_introduction_test.dart'),
+    );
 
     final technologyArticleIntroduction = ArticleIntroductionBlock(
-      category: category,
+      categoryId: category.id,
       author: author,
       publishedAt: publishedAt,
       imageUrl: imageUrl,
@@ -38,6 +40,7 @@ void main() {
               children: [
                 ArticleIntroduction(
                   block: technologyArticleIntroduction,
+                  categoryName: category.name,
                   premiumText: premiumText,
                 ),
               ],

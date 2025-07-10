@@ -8,7 +8,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_secure_storage: ^9.0.0
+  flutter_secure_storage: ^9.2.2
   storage:
     path: ../storage
 
@@ -16,4 +16,4 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   mocktail: ^1.0.2
-  very_good_analysis: ^5.1.0
+  very_good_analysis: ^6.0.0

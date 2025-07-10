@@ -128,7 +128,7 @@ class FirebaseAuthenticationClient implements AuthenticationClient {
         );
       }
 
-      final accessToken = loginResult.accessToken?.token;
+      final accessToken = loginResult.accessToken?.tokenString;
       if (accessToken == null) {
         throw LogInWithFacebookFailure(
           Exception(
@@ -268,6 +268,23 @@ class FirebaseAuthenticationClient implements AuthenticationClient {
       ]);
     } catch (error, stackTrace) {
       Error.throwWithStackTrace(LogOutFailure(error), stackTrace);
+    }
+  }
+
+  /// Deletes and signs out the user.
+  @override
+  Future<void> deleteAccount() async {
+    try {
+      final user = _firebaseAuth.currentUser;
+      if (user == null) {
+        throw DeleteAccountFailure(
+          Exception('User is not authenticated'),
+        );
+      }
+
+      await user.delete();
+    } catch (error, stackTrace) {
+      Error.throwWithStackTrace(DeleteAccountFailure(error), stackTrace);
     }
   }
 
