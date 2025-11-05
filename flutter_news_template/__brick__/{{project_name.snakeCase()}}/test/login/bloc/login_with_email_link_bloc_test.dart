@@ -20,15 +20,14 @@ void main() {
       userRepository = MockUserRepository();
 
       incomingEmailLinksController = StreamController<Uri>();
-      when(() => userRepository.incomingEmailLinks)
-          .thenAnswer((_) => incomingEmailLinksController.stream);
+      when(
+        () => userRepository.incomingEmailLinks,
+      ).thenAnswer((_) => incomingEmailLinksController.stream);
     });
 
     test('initial state is LoginWithEmailLinkState', () {
       expect(
-        LoginWithEmailLinkBloc(
-          userRepository: userRepository,
-        ).state,
+        LoginWithEmailLinkBloc(userRepository: userRepository).state,
         LoginWithEmailLinkState(),
       );
     });
@@ -37,8 +36,9 @@ void main() {
       const email = 'email@example.com';
 
       final user = MockUser();
-      final continueUrl =
-          Uri.https('continue.link', '', <String, String>{'email': email});
+      final continueUrl = Uri.https('continue.link', '', <String, String>{
+        'email': email,
+      });
 
       final validEmailLink = Uri.https(
         'email.link',
@@ -58,8 +58,9 @@ void main() {
       );
 
       setUp(() {
-        when(() => userRepository.user)
-            .thenAnswer((invocation) => Stream.value(user));
+        when(
+          () => userRepository.user,
+        ).thenAnswer((invocation) => Stream.value(user));
 
         when(
           () => userRepository.logInWithEmailLink(
@@ -79,7 +80,7 @@ void main() {
         act: (bloc) => incomingEmailLinksController.add(validEmailLink),
         expect: () => const <LoginWithEmailLinkState>[
           LoginWithEmailLinkState(status: LoginWithEmailLinkStatus.loading),
-          LoginWithEmailLinkState(status: LoginWithEmailLinkStatus.failure)
+          LoginWithEmailLinkState(status: LoginWithEmailLinkStatus.failure),
         ],
       );
 
@@ -95,7 +96,7 @@ void main() {
             incomingEmailLinksController.add(emailLinkWithoutContinueUrl),
         expect: () => const <LoginWithEmailLinkState>[
           LoginWithEmailLinkState(status: LoginWithEmailLinkStatus.loading),
-          LoginWithEmailLinkState(status: LoginWithEmailLinkStatus.failure)
+          LoginWithEmailLinkState(status: LoginWithEmailLinkStatus.failure),
         ],
       );
 
@@ -111,7 +112,7 @@ void main() {
             incomingEmailLinksController.add(emailLinkWithInvalidContinueUrl),
         expect: () => const <LoginWithEmailLinkState>[
           LoginWithEmailLinkState(status: LoginWithEmailLinkStatus.loading),
-          LoginWithEmailLinkState(status: LoginWithEmailLinkStatus.failure)
+          LoginWithEmailLinkState(status: LoginWithEmailLinkStatus.failure),
         ],
       );
 
@@ -133,7 +134,7 @@ void main() {
         act: (bloc) => incomingEmailLinksController.add(validEmailLink),
         expect: () => const <LoginWithEmailLinkState>[
           LoginWithEmailLinkState(status: LoginWithEmailLinkStatus.loading),
-          LoginWithEmailLinkState(status: LoginWithEmailLinkStatus.failure)
+          LoginWithEmailLinkState(status: LoginWithEmailLinkStatus.failure),
         ],
       );
 
@@ -149,7 +150,7 @@ void main() {
         act: (bloc) => incomingEmailLinksController.add(validEmailLink),
         expect: () => const <LoginWithEmailLinkState>[
           LoginWithEmailLinkState(status: LoginWithEmailLinkStatus.loading),
-          LoginWithEmailLinkState(status: LoginWithEmailLinkStatus.success)
+          LoginWithEmailLinkState(status: LoginWithEmailLinkStatus.success),
         ],
       );
 
@@ -174,9 +175,7 @@ void main() {
     group('close', () {
       blocTest<LoginWithEmailLinkBloc, LoginWithEmailLinkState>(
         'cancels UserRepository.incomingEmailLinks subscription',
-        build: () => LoginWithEmailLinkBloc(
-          userRepository: userRepository,
-        ),
+        build: () => LoginWithEmailLinkBloc(userRepository: userRepository),
         tearDown: () {
           expect(incomingEmailLinksController.hasListener, isFalse);
         },

@@ -26,7 +26,8 @@ void main() {
       3,
       (index) => SlideBlock(
         caption: 'Oink, Oink',
-        description: 'Domestic pigs come in different colors, '
+        description:
+            'Domestic pigs come in different colors, '
             'shapes and sizes. They are usually pink, but little pigs kept as'
             ' pets (pot-bellied pigs) are sometimes other colors. '
             ' Pigs roll in mud to protect themselves from sunlight. '
@@ -196,7 +197,7 @@ void main() {
         final currentPage = tester
             .widget<PageView>(find.byKey(slideshowPageViewKey))
             .controller
-            .page;
+            ?.page;
 
         // Check current page
         expect(currentPage, 2);
@@ -237,7 +238,7 @@ void main() {
         final currentPage = tester
             .widget<PageView>(find.byKey(slideshowPageViewKey))
             .controller
-            .page;
+            ?.page;
 
         // Check current page
         expect(currentPage, 1);

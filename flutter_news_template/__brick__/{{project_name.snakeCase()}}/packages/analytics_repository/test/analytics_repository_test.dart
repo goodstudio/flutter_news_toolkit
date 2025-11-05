@@ -62,8 +62,7 @@ void main() {
         ).called(1);
       });
 
-      test(
-          'throws TrackEventFailure '
+      test('throws TrackEventFailure '
           'when logEvent throws exception', () async {
         when(
           () => firebaseAnalytics.logEvent(
@@ -74,7 +73,7 @@ void main() {
 
         const analyticEvent1 = AnalyticsEvent(
           'event1',
-          properties: <String, dynamic>{
+          properties: <String, Object>{
             'property1': 'value1',
             'property2': 'value2',
           },
@@ -93,13 +92,10 @@ void main() {
 
         analyticsRepository.setUserId(userId);
 
-        verify(
-          () => firebaseAnalytics.setUserId(id: userId),
-        ).called(1);
+        verify(() => firebaseAnalytics.setUserId(id: userId)).called(1);
       });
 
-      test(
-          'throws SetUserIdFailure '
+      test('throws SetUserIdFailure '
           'when setUserId throws exception', () async {
         when(
           () => firebaseAnalytics.setUserId(id: any(named: 'id')),

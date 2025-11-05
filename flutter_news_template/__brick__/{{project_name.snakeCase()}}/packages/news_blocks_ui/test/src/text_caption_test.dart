@@ -9,10 +9,9 @@ import '../helpers/helpers.dart';
 
 void main() {
   group('TextCaption', () {
-    setUpAll(setUpTolerantComparator);
+    setUpAll(() => setUpTolerantComparator('test/src/text_caption_test.dart'));
 
-    testWidgets(
-        'renders correctly '
+    testWidgets('renders correctly '
         'with default normal color', (tester) async {
       final widget = Center(
         child: TextCaption(
@@ -31,8 +30,7 @@ void main() {
       );
     });
 
-    testWidgets(
-        'renders correctly '
+    testWidgets('renders correctly '
         'with default light color', (tester) async {
       final widget = Center(
         child: TextCaption(
@@ -51,8 +49,7 @@ void main() {
       );
     });
 
-    testWidgets(
-        'renders correctly '
+    testWidgets('renders correctly '
         'with provided normal color', (tester) async {
       final widget = Center(
         child: TextCaption(
@@ -60,9 +57,7 @@ void main() {
             text: 'Text caption',
             color: TextCaptionColor.normal,
           ),
-          colorValues: const {
-            TextCaptionColor.normal: Colors.green,
-          },
+          colorValues: const {TextCaptionColor.normal: Colors.green},
         ),
       );
 
@@ -74,8 +69,7 @@ void main() {
       );
     });
 
-    testWidgets(
-        'renders correctly '
+    testWidgets('renders correctly '
         'with provided light color', (tester) async {
       final widget = Center(
         child: TextCaption(
@@ -83,9 +77,7 @@ void main() {
             text: 'Text caption',
             color: TextCaptionColor.light,
           ),
-          colorValues: const {
-            TextCaptionColor.light: Colors.green,
-          },
+          colorValues: const {TextCaptionColor.light: Colors.green},
         ),
       );
 

@@ -7,13 +7,13 @@ import '../helpers/helpers.dart';
 
 void main() {
   group('SectionHeader', () {
-    setUpAll(setUpTolerantComparator);
+    setUpAll(
+      () => setUpTolerantComparator('test/src/section_header_test.dart'),
+    );
 
     testWidgets('renders correctly without action', (tester) async {
       const widget = Center(
-        child: SectionHeader(
-          block: SectionHeaderBlock(title: 'example'),
-        ),
+        child: SectionHeader(block: SectionHeaderBlock(title: 'example')),
       );
 
       await tester.pumpApp(widget);
@@ -25,11 +25,12 @@ void main() {
     });
 
     testWidgets('renders correctly with action', (tester) async {
+      const category = Category(id: 'sports', name: 'Sports');
       const widget = Center(
         child: SectionHeader(
           block: SectionHeaderBlock(
             title: 'example',
-            action: NavigateToFeedCategoryAction(category: Category.top),
+            action: NavigateToFeedCategoryAction(category: category),
           ),
         ),
       );
@@ -43,15 +44,13 @@ void main() {
     });
 
     testWidgets('onPressed is called with action on tap', (tester) async {
+      const category = Category(id: 'sports', name: 'Sports');
       final actions = <BlockAction>[];
-      const action = NavigateToFeedCategoryAction(category: Category.top);
+      const action = NavigateToFeedCategoryAction(category: category);
 
       final widget = Center(
         child: SectionHeader(
-          block: const SectionHeaderBlock(
-            title: 'example',
-            action: action,
-          ),
+          block: const SectionHeaderBlock(title: 'example', action: action),
           onPressed: actions.add,
         ),
       );

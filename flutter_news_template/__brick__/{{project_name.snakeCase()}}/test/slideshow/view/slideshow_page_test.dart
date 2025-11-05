@@ -28,10 +28,7 @@ void main() {
 
     test('has a route', () {
       expect(
-        SlideshowPage.route(
-          slideshow: slideshow,
-          articleId: articleId,
-        ),
+        SlideshowPage.route(slideshow: slideshow, articleId: articleId),
         isA<MaterialPageRoute<void>>(),
       );
     });
@@ -39,10 +36,7 @@ void main() {
     testWidgets('renders a SlideshowView', (tester) async {
       await mockNetworkImages(
         () => tester.pumpApp(
-          SlideshowPage(
-            slideshow: slideshow,
-            articleId: articleId,
-          ),
+          SlideshowPage(slideshow: slideshow, articleId: articleId),
         ),
       );
 
@@ -52,14 +46,11 @@ void main() {
     group('navigates', () {
       testWidgets('back when leading button is pressed.', (tester) async {
         final navigator = MockNavigator();
-
+        when(navigator.canPop).thenAnswer((_) => true);
         when(() => navigator.popUntil(any())).thenAnswer((_) async {});
         await mockNetworkImages(
           () => tester.pumpApp(
-            SlideshowPage(
-              slideshow: slideshow,
-              articleId: articleId,
-            ),
+            SlideshowPage(slideshow: slideshow, articleId: articleId),
             navigator: navigator,
           ),
         );

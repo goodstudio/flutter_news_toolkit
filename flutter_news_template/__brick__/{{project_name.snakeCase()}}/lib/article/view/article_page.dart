@@ -43,14 +43,13 @@ class ArticlePage extends StatelessWidget {
     bool isVideoArticle = false,
     InterstitialAdBehavior interstitialAdBehavior =
         InterstitialAdBehavior.onOpen,
-  }) =>
-      MaterialPageRoute<void>(
-        builder: (_) => ArticlePage(
-          id: id,
-          isVideoArticle: isVideoArticle,
-          interstitialAdBehavior: interstitialAdBehavior,
-        ),
-      );
+  }) => MaterialPageRoute<void>(
+    builder: (_) => ArticlePage(
+      id: id,
+      isVideoArticle: isVideoArticle,
+      interstitialAdBehavior: interstitialAdBehavior,
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -80,19 +79,19 @@ class ArticleView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final backgroundColor =
-        isVideoArticle ? AppColors.darkBackground : AppColors.white;
-    final foregroundColor =
-        isVideoArticle ? AppColors.white : AppColors.highEmphasisSurface;
+    final backgroundColor = isVideoArticle
+        ? AppColors.darkBackground
+        : AppColors.white;
+    final foregroundColor = isVideoArticle
+        ? AppColors.white
+        : AppColors.highEmphasisSurface;
     final uri = context.select((ArticleBloc bloc) => bloc.state.uri);
-    final isSubscriber =
-        context.select<AppBloc, bool>((bloc) => bloc.state.isUserSubscribed);
+    final isSubscriber = context.select<AppBloc, bool>(
+      (bloc) => bloc.state.isUserSubscribed,
+    );
 
-    return WillPopScope(
-      onWillPop: () async {
-        _onPop(context);
-        return true;
-      },
+    return PopScope(
+      onPopInvokedWithResult: (_, __) => _onPop(context),
       child: HasToShowInterstitialAdListener(
         interstitialAdBehavior: interstitialAdBehavior,
         child: HasReachedArticleLimitListener(
@@ -101,18 +100,16 @@ class ArticleView extends StatelessWidget {
               backgroundColor: backgroundColor,
               appBar: AppBar(
                 systemOverlayStyle: SystemUiOverlayStyle(
-                  statusBarIconBrightness:
-                      isVideoArticle ? Brightness.light : Brightness.dark,
-                  statusBarBrightness:
-                      isVideoArticle ? Brightness.dark : Brightness.light,
+                  statusBarIconBrightness: isVideoArticle
+                      ? Brightness.light
+                      : Brightness.dark,
+                  statusBarBrightness: isVideoArticle
+                      ? Brightness.dark
+                      : Brightness.light,
                 ),
                 leading: isVideoArticle
-                    ? AppBackButton.light(
-                        onPressed: () => _onBackButtonPressed(context),
-                      )
-                    : AppBackButton(
-                        onPressed: () => _onBackButtonPressed(context),
-                      ),
+                    ? AppBackButton.light(onPressed: Navigator.of(context).pop)
+                    : AppBackButton(onPressed: Navigator.of(context).pop),
                 actions: [
                   if (uri != null && uri.toString().isNotEmpty)
                     Padding(
@@ -121,12 +118,12 @@ class ArticleView extends StatelessWidget {
                       child: ShareButton(
                         shareText: context.l10n.shareText,
                         color: foregroundColor,
-                        onPressed: () => context
-                            .read<ArticleBloc>()
-                            .add(ShareRequested(uri: uri)),
+                        onPressed: () => context.read<ArticleBloc>().add(
+                          ShareRequested(uri: uri),
+                        ),
                       ),
                     ),
-                  if (!isSubscriber) const ArticleSubscribeButton()
+                  if (!isSubscriber) const ArticleSubscribeButton(),
                 ],
               ),
               body: ArticleThemeOverride(
@@ -140,18 +137,13 @@ class ArticleView extends StatelessWidget {
     );
   }
 
-  void _onBackButtonPressed(BuildContext context) {
-    _onPop(context);
-    Navigator.of(context).pop();
-  }
-
   void _onPop(BuildContext context) {
     final state = context.read<ArticleBloc>().state;
     if (state.showInterstitialAd &&
         interstitialAdBehavior == InterstitialAdBehavior.onClose) {
-      context
-          .read<FullScreenAdsBloc>()
-          .add(const ShowInterstitialAdRequested());
+      context.read<FullScreenAdsBloc>().add(
+        const ShowInterstitialAdRequested(),
+      );
     }
   }
 }
@@ -236,9 +228,9 @@ class HasToShowInterstitialAdListener extends StatelessWidget {
       listener: (context, state) {
         if (state.showInterstitialAd &&
             interstitialAdBehavior == InterstitialAdBehavior.onOpen) {
-          context
-              .read<FullScreenAdsBloc>()
-              .add(const ShowInterstitialAdRequested());
+          context.read<FullScreenAdsBloc>().add(
+            const ShowInterstitialAdRequested(),
+          );
         }
       },
       listenWhen: (previous, current) =>

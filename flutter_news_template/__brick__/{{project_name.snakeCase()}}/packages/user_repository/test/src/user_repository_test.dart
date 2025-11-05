@@ -14,7 +14,7 @@ class MockAuthenticationClient extends Mock implements AuthenticationClient {}
 
 class MockPackageInfoClient extends Mock implements PackageInfoClient {}
 
-class MockDeepLinkClient extends Mock implements DeepLinkClient {}
+class MockDeepLinkService extends Mock implements DeepLinkService {}
 
 class MockUserStorage extends Mock implements UserStorage {}
 
@@ -45,6 +45,8 @@ class FakeLogInWithFacebookCanceled extends Fake
 
 class FakeLogOutFailure extends Fake implements LogOutFailure {}
 
+class FakeDeleteAccountFailure extends Fake implements DeleteAccountFailure {}
+
 class FakeSendLoginEmailLinkFailure extends Fake
     implements SendLoginEmailLinkFailure {}
 
@@ -55,7 +57,7 @@ void main() {
   group('UserRepository', () {
     late AuthenticationClient authenticationClient;
     late PackageInfoClient packageInfoClient;
-    late DeepLinkClient deepLinkClient;
+    late DeepLinkService deepLinkService;
     late UserStorage storage;
     late StreamController<Uri> deepLinkClientController;
     late UserRepository userRepository;
@@ -64,42 +66,41 @@ void main() {
     setUp(() {
       authenticationClient = MockAuthenticationClient();
       packageInfoClient = MockPackageInfoClient();
-      deepLinkClient = MockDeepLinkClient();
+      deepLinkService = MockDeepLinkService();
       storage = MockUserStorage();
       deepLinkClientController = StreamController<Uri>.broadcast();
       apiClient = Mock{{project_name.pascalCase()}}ApiClient();
 
-      when(() => deepLinkClient.deepLinkStream)
-          .thenAnswer((_) => deepLinkClientController.stream);
+      when(
+        () => deepLinkService.deepLinkStream,
+      ).thenAnswer((_) => deepLinkClientController.stream);
 
       userRepository = UserRepository(
         apiClient: apiClient,
         authenticationClient: authenticationClient,
         packageInfoClient: packageInfoClient,
-        deepLinkClient: deepLinkClient,
+        deepLinkService: deepLinkService,
         storage: storage,
       );
     });
 
     test(
-        'currentSubscriptionPlan emits none '
-        'when initialized and authenticationClient.user is anonymous',
-        () async {
-      when(() => authenticationClient.user).thenAnswer(
-        (invocation) => Stream.value(AuthenticationUser.anonymous),
-      );
-      final response = await userRepository.user.first;
-      expect(
-        response.subscriptionPlan,
-        equals(api.SubscriptionPlan.none),
-      );
-    });
+      'currentSubscriptionPlan emits none '
+      'when initialized and authenticationClient.user is anonymous',
+      () async {
+        when(() => authenticationClient.user).thenAnswer(
+          (invocation) => Stream.value(AuthenticationUser.anonymous),
+        );
+        final response = await userRepository.user.first;
+        expect(response.subscriptionPlan, equals(api.SubscriptionPlan.none));
+      },
+    );
 
     group('user', () {
       test('calls user on AuthenticationClient', () {
-        when(() => authenticationClient.user).thenAnswer(
-          (_) => const Stream.empty(),
-        );
+        when(
+          () => authenticationClient.user,
+        ).thenAnswer((_) => const Stream.empty());
         userRepository.user;
         verify(() => authenticationClient.user).called(1);
       });
@@ -110,8 +111,7 @@ void main() {
       final validEmailLink2 = Uri.https('valid.email.link');
       final invalidEmailLink = Uri.https('invalid.email.link');
 
-      test(
-          'emits a new email link '
+      test('emits a new email link '
           'for every valid email link from DeepLinkClient.deepLinkStream', () {
         when(
           () => authenticationClient.isLogInWithEmailLink(
@@ -133,10 +133,7 @@ void main() {
 
         expectLater(
           userRepository.incomingEmailLinks,
-          emitsInOrder(<Uri>[
-            validEmailLink,
-            validEmailLink2,
-          ]),
+          emitsInOrder(<Uri>[validEmailLink, validEmailLink2]),
         );
 
         deepLinkClientController
@@ -157,13 +154,8 @@ void main() {
 
       test('rethrows LogInWithAppleFailure', () async {
         final exception = FakeLogInWithAppleFailure();
-        when(
-          () => authenticationClient.logInWithApple(),
-        ).thenThrow(exception);
-        expect(
-          () => userRepository.logInWithApple(),
-          throwsA(exception),
-        );
+        when(() => authenticationClient.logInWithApple()).thenThrow(exception);
+        expect(() => userRepository.logInWithApple(), throwsA(exception));
       });
 
       test('throws LogInWithAppleFailure on generic exception', () async {
@@ -220,15 +212,17 @@ void main() {
 
       test('rethrows LogInWithTwitterFailure', () async {
         final exception = FakeLogInWithTwitterFailure();
-        when(() => authenticationClient.logInWithTwitter())
-            .thenThrow(exception);
+        when(
+          () => authenticationClient.logInWithTwitter(),
+        ).thenThrow(exception);
         expect(() => userRepository.logInWithTwitter(), throwsA(exception));
       });
 
       test('rethrows LogInWithTwitterCanceled', () async {
         final exception = FakeLogInWithTwitterCanceled();
-        when(() => authenticationClient.logInWithTwitter())
-            .thenThrow(exception);
+        when(
+          () => authenticationClient.logInWithTwitter(),
+        ).thenThrow(exception);
         expect(userRepository.logInWithTwitter(), throwsA(exception));
       });
 
@@ -254,15 +248,17 @@ void main() {
 
       test('rethrows LogInWithFacebookFailure', () async {
         final exception = FakeLogInWithFacebookFailure();
-        when(() => authenticationClient.logInWithFacebook())
-            .thenThrow(exception);
+        when(
+          () => authenticationClient.logInWithFacebook(),
+        ).thenThrow(exception);
         expect(() => userRepository.logInWithFacebook(), throwsA(exception));
       });
 
       test('rethrows LogInWithFacebookCanceled', () async {
         final exception = FakeLogInWithFacebookCanceled();
-        when(() => authenticationClient.logInWithFacebook())
-            .thenThrow(exception);
+        when(
+          () => authenticationClient.logInWithFacebook(),
+        ).thenThrow(exception);
         expect(userRepository.logInWithFacebook(), throwsA(exception));
       });
 
@@ -281,9 +277,7 @@ void main() {
       const packageName = 'appPackageName';
 
       setUp(() {
-        when(
-          () => packageInfoClient.packageName,
-        ).thenReturn(packageName);
+        when(() => packageInfoClient.packageName).thenReturn(packageName);
         when(
           () => authenticationClient.sendLoginEmailLink(
             email: any(named: 'email'),
@@ -292,8 +286,7 @@ void main() {
         ).thenAnswer((_) async {});
       });
 
-      test(
-          'calls sendLoginEmailLink on AuthenticationClient '
+      test('calls sendLoginEmailLink on AuthenticationClient '
           'with email and app package name from PackageInfoClient', () async {
         await userRepository.sendLoginEmailLink(
           email: 'ben_franklin@upenn.edu',
@@ -323,8 +316,7 @@ void main() {
         );
       });
 
-      test(
-          'throws FakeSendLoginEmailLinkFailure '
+      test('throws FakeSendLoginEmailLinkFailure '
           'on generic exception', () async {
         when(
           () => authenticationClient.sendLoginEmailLink(
@@ -419,6 +411,30 @@ void main() {
       });
     });
 
+    group('deleteAccount', () {
+      test('calls logOut on AuthenticationClient', () async {
+        when(
+          () => authenticationClient.deleteAccount(),
+        ).thenAnswer((_) async {});
+        await userRepository.deleteAccount();
+        verify(() => authenticationClient.deleteAccount()).called(1);
+      });
+
+      test('rethrows DeleteAccountFailure', () async {
+        final exception = FakeDeleteAccountFailure();
+        when(() => authenticationClient.deleteAccount()).thenThrow(exception);
+        expect(() => userRepository.deleteAccount(), throwsA(exception));
+      });
+
+      test('throws DeleteAccountFailure on generic exception', () async {
+        when(() => authenticationClient.deleteAccount()).thenThrow(Exception());
+        expect(
+          () => userRepository.deleteAccount(),
+          throwsA(isA<DeleteAccountFailure>()),
+        );
+      });
+    });
+
     group('UserFailure', () {
       final error = Exception('errorMessage');
 
@@ -443,14 +459,13 @@ void main() {
           apiClient: apiClient,
           authenticationClient: authenticationClient,
           packageInfoClient: packageInfoClient,
-          deepLinkClient: deepLinkClient,
+          deepLinkService: deepLinkService,
           storage: storage,
         ).fetchAppOpenedCount();
         expect(result, 1);
       });
 
-      test(
-          'throws a FetchAppOpenedCountFailure '
+      test('throws a FetchAppOpenedCountFailure '
           'when fetching app opened count fails', () async {
         when(() => storage.fetchAppOpenedCount()).thenThrow(Exception());
 
@@ -459,7 +474,7 @@ void main() {
             apiClient: apiClient,
             authenticationClient: authenticationClient,
             packageInfoClient: packageInfoClient,
-            deepLinkClient: deepLinkClient,
+            deepLinkService: deepLinkService,
             storage: storage,
           ).fetchAppOpenedCount(),
           throwsA(isA<FetchAppOpenedCountFailure>()),
@@ -480,15 +495,14 @@ void main() {
             apiClient: apiClient,
             authenticationClient: authenticationClient,
             packageInfoClient: packageInfoClient,
-            deepLinkClient: deepLinkClient,
+            deepLinkService: deepLinkService,
             storage: storage,
           ).incrementAppOpenedCount(),
           completes,
         );
       });
 
-      test(
-          'throws a IncrementAppOpenedCountFailure '
+      test('throws a IncrementAppOpenedCountFailure '
           'when setting app opened count fails', () async {
         when(
           () => storage.setAppOpenedCount(count: any(named: 'count')),
@@ -499,7 +513,7 @@ void main() {
             apiClient: apiClient,
             authenticationClient: authenticationClient,
             packageInfoClient: packageInfoClient,
-            deepLinkClient: deepLinkClient,
+            deepLinkService: deepLinkService,
             storage: storage,
           ).incrementAppOpenedCount(),
           throwsA(isA<IncrementAppOpenedCountFailure>()),
@@ -511,10 +525,7 @@ void main() {
       test('calls getCurrentUser on ApiClient', () async {
         when(() => apiClient.getCurrentUser()).thenAnswer(
           (_) async => api.CurrentUserResponse(
-            user: api.User(
-              id: 'id',
-              subscription: api.SubscriptionPlan.none,
-            ),
+            user: api.User(id: 'id', subscription: api.SubscriptionPlan.none),
           ),
         );
         await userRepository.updateSubscriptionPlan();
@@ -522,9 +533,7 @@ void main() {
       });
 
       test('throws FetchCurrentSubscriptionFailure on failure', () async {
-        when(
-          () => apiClient.getCurrentUser(),
-        ).thenThrow(Exception());
+        when(() => apiClient.getCurrentUser()).thenThrow(Exception());
         expect(
           () => userRepository.updateSubscriptionPlan(),
           throwsA(isA<FetchCurrentSubscriptionFailure>()),
