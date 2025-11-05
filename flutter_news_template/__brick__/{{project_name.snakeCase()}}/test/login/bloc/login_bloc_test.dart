@@ -36,9 +36,7 @@ void main() {
         () => userRepository.logInWithApple(),
       ).thenAnswer((_) => Future<void>.value());
       when(
-        () => userRepository.sendLoginEmailLink(
-          email: any(named: 'email'),
-        ),
+        () => userRepository.sendLoginEmailLink(email: any(named: 'email')),
       ).thenAnswer((_) => Future<void>.value());
     });
 
@@ -51,9 +49,7 @@ void main() {
         'emits [invalid] when email is invalid',
         build: () => LoginBloc(userRepository: userRepository),
         act: (bloc) => bloc.add(LoginEmailChanged(invalidEmailString)),
-        expect: () => const <LoginState>[
-          LoginState(email: invalidEmail),
-        ],
+        expect: () => const <LoginState>[LoginState(email: invalidEmail)],
       );
 
       blocTest<LoginBloc, LoginState>(
@@ -81,9 +77,7 @@ void main() {
         act: (bloc) => bloc.add(SendEmailLinkSubmitted()),
         verify: (_) {
           verify(
-            () => userRepository.sendLoginEmailLink(
-              email: validEmailString,
-            ),
+            () => userRepository.sendLoginEmailLink(email: validEmailString),
           ).called(1);
         },
       );
@@ -104,7 +98,7 @@ void main() {
             status: FormzSubmissionStatus.success,
             email: validEmail,
             valid: true,
-          )
+          ),
         ],
       );
 
@@ -113,9 +107,7 @@ void main() {
         'when sendLoginEmailLink fails',
         setUp: () {
           when(
-            () => userRepository.sendLoginEmailLink(
-              email: any(named: 'email'),
-            ),
+            () => userRepository.sendLoginEmailLink(email: any(named: 'email')),
           ).thenThrow(Exception('oops'));
         },
         build: () => LoginBloc(userRepository: userRepository),
@@ -131,7 +123,7 @@ void main() {
             status: FormzSubmissionStatus.failure,
             email: validEmail,
             valid: true,
-          )
+          ),
         ],
       );
     });
@@ -153,7 +145,7 @@ void main() {
         act: (bloc) => bloc.add(LoginGoogleSubmitted()),
         expect: () => const <LoginState>[
           LoginState(status: FormzSubmissionStatus.inProgress),
-          LoginState(status: FormzSubmissionStatus.success)
+          LoginState(status: FormzSubmissionStatus.success),
         ],
       );
 
@@ -169,7 +161,7 @@ void main() {
         act: (bloc) => bloc.add(LoginGoogleSubmitted()),
         expect: () => const <LoginState>[
           LoginState(status: FormzSubmissionStatus.inProgress),
-          LoginState(status: FormzSubmissionStatus.failure)
+          LoginState(status: FormzSubmissionStatus.failure),
         ],
       );
 
@@ -207,7 +199,7 @@ void main() {
         act: (bloc) => bloc.add(LoginTwitterSubmitted()),
         expect: () => const <LoginState>[
           LoginState(status: FormzSubmissionStatus.inProgress),
-          LoginState(status: FormzSubmissionStatus.success)
+          LoginState(status: FormzSubmissionStatus.success),
         ],
       );
 
@@ -223,7 +215,7 @@ void main() {
         act: (bloc) => bloc.add(LoginTwitterSubmitted()),
         expect: () => const <LoginState>[
           LoginState(status: FormzSubmissionStatus.inProgress),
-          LoginState(status: FormzSubmissionStatus.failure)
+          LoginState(status: FormzSubmissionStatus.failure),
         ],
       );
 
@@ -233,9 +225,7 @@ void main() {
         setUp: () {
           when(
             () => userRepository.logInWithTwitter(),
-          ).thenThrow(
-            LogInWithTwitterCanceled(Exception()),
-          );
+          ).thenThrow(LogInWithTwitterCanceled(Exception()));
         },
         build: () => LoginBloc(userRepository: userRepository),
         act: (bloc) => bloc.add(LoginTwitterSubmitted()),
@@ -263,7 +253,7 @@ void main() {
         act: (bloc) => bloc.add(LoginFacebookSubmitted()),
         expect: () => const <LoginState>[
           LoginState(status: FormzSubmissionStatus.inProgress),
-          LoginState(status: FormzSubmissionStatus.success)
+          LoginState(status: FormzSubmissionStatus.success),
         ],
       );
 
@@ -279,7 +269,7 @@ void main() {
         act: (bloc) => bloc.add(LoginFacebookSubmitted()),
         expect: () => const <LoginState>[
           LoginState(status: FormzSubmissionStatus.inProgress),
-          LoginState(status: FormzSubmissionStatus.failure)
+          LoginState(status: FormzSubmissionStatus.failure),
         ],
       );
 
@@ -289,9 +279,7 @@ void main() {
         setUp: () {
           when(
             () => userRepository.logInWithFacebook(),
-          ).thenThrow(
-            LogInWithFacebookCanceled(Exception()),
-          );
+          ).thenThrow(LogInWithFacebookCanceled(Exception()));
         },
         build: () => LoginBloc(userRepository: userRepository),
         act: (bloc) => bloc.add(LoginFacebookSubmitted()),
@@ -319,7 +307,7 @@ void main() {
         act: (bloc) => bloc.add(LoginAppleSubmitted()),
         expect: () => const <LoginState>[
           LoginState(status: FormzSubmissionStatus.inProgress),
-          LoginState(status: FormzSubmissionStatus.success)
+          LoginState(status: FormzSubmissionStatus.success),
         ],
       );
 
@@ -335,7 +323,7 @@ void main() {
         act: (bloc) => bloc.add(LoginAppleSubmitted()),
         expect: () => const <LoginState>[
           LoginState(status: FormzSubmissionStatus.inProgress),
-          LoginState(status: FormzSubmissionStatus.failure)
+          LoginState(status: FormzSubmissionStatus.failure),
         ],
       );
     });

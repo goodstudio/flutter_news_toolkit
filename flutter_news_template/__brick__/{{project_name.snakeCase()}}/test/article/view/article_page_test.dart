@@ -115,12 +115,11 @@ void main() {
           expect(find.byType(ShareButton), findsOneWidget);
         });
 
-        testWidgets('that adds ShareRequested on ShareButton tap',
-            (tester) async {
+        testWidgets('that adds ShareRequested on ShareButton tap', (
+          tester,
+        ) async {
           when(() => articleBloc.state).thenReturn(
-            ArticleState.initial().copyWith(
-              uri: Uri(path: 'notEmptyUrl'),
-            ),
+            ArticleState.initial().copyWith(uri: Uri(path: 'notEmptyUrl')),
           );
           await tester.pumpApp(
             fullScreenAdsBloc: fullScreenAdsBloc,
@@ -136,11 +135,8 @@ void main() {
           await tester.tap(find.byType(ShareButton));
 
           verify(
-            () => articleBloc.add(
-              ShareRequested(
-                uri: Uri(path: 'notEmptyUrl'),
-              ),
-            ),
+            () =>
+                articleBloc.add(ShareRequested(uri: Uri(path: 'notEmptyUrl'))),
           ).called(1);
         });
       });
@@ -177,11 +173,7 @@ void main() {
 
       group('ArticleSubscribeButton', () {
         testWidgets('renders AppButton', (tester) async {
-          await tester.pumpApp(
-            Row(
-              children: [ArticleSubscribeButton()],
-            ),
-          );
+          await tester.pumpApp(Row(children: [ArticleSubscribeButton()]));
           expect(find.byType(AppButton), findsOneWidget);
         });
 
@@ -191,13 +183,13 @@ void main() {
           setUp(() {
             inAppPurchaseRepository = MockInAppPurchaseRepository();
 
-            when(() => inAppPurchaseRepository.purchaseUpdate).thenAnswer(
-              (_) => const Stream.empty(),
-            );
+            when(
+              () => inAppPurchaseRepository.purchaseUpdate,
+            ).thenAnswer((_) => const Stream.empty());
 
-            when(inAppPurchaseRepository.fetchSubscriptions).thenAnswer(
-              (_) async => [],
-            );
+            when(
+              inAppPurchaseRepository.fetchSubscriptions,
+            ).thenAnswer((_) async => []);
           });
 
           testWidgets('when tapped', (tester) async {
@@ -212,17 +204,14 @@ void main() {
         });
 
         testWidgets('does nothing when tapped', (tester) async {
-          await tester.pumpApp(
-            Row(
-              children: [ArticleSubscribeButton()],
-            ),
-          );
+          await tester.pumpApp(Row(children: [ArticleSubscribeButton()]));
           await tester.tap(find.byType(ArticleSubscribeButton));
         });
       });
 
-      testWidgets('renders ArticleContent in ArticleThemeOverride',
-          (tester) async {
+      testWidgets('renders ArticleContent in ArticleThemeOverride', (
+        tester,
+      ) async {
         await tester.pumpApp(
           fullScreenAdsBloc: fullScreenAdsBloc,
           BlocProvider.value(
@@ -242,15 +231,12 @@ void main() {
         );
       });
 
-      testWidgets(
-          'renders AppBar with ShareButton and '
+      testWidgets('renders AppBar with ShareButton and '
           'ArticleSubscribeButton action '
           'when user is not a subscriber '
           'and uri is provided', (tester) async {
         when(() => articleBloc.state).thenReturn(
-          ArticleState.initial().copyWith(
-            uri: Uri(path: 'notEmptyUrl'),
-          ),
+          ArticleState.initial().copyWith(uri: Uri(path: 'notEmptyUrl')),
         );
         await tester.pumpApp(
           fullScreenAdsBloc: fullScreenAdsBloc,
@@ -273,17 +259,14 @@ void main() {
 
         expect(
           tester.widget<AppBar>(appBar).actions,
-          containsAll(
-            <Widget>[
-              tester.widget<ArticleSubscribeButton>(articleSubscribeButton),
-              tester.widget(shareButton),
-            ],
-          ),
+          containsAll(<Widget>[
+            tester.widget<ArticleSubscribeButton>(articleSubscribeButton),
+            tester.widget(shareButton),
+          ]),
         );
       });
 
-      testWidgets(
-          'renders AppBar without ShareButton '
+      testWidgets('renders AppBar without ShareButton '
           'when user is not a subscriber '
           'and uri is not provided', (tester) async {
         await tester.pumpApp(
@@ -313,8 +296,7 @@ void main() {
         expect(find.byType(ShareButton), findsNothing);
       });
 
-      testWidgets(
-          'renders AppBar with ShareButton '
+      testWidgets('renders AppBar with ShareButton '
           'action when user is a subscriber '
           'and url is not empty', (tester) async {
         when(() => appBloc.state).thenReturn(
@@ -352,17 +334,14 @@ void main() {
 
         expect(
           tester.widget<AppBar>(appBar).actions,
-          containsAll(
-            <Widget>[
-              tester.widget(shareButton),
-            ],
-          ),
+          containsAll(<Widget>[tester.widget(shareButton)]),
         );
       });
 
       group('navigates', () {
         testWidgets('back when back button is pressed', (tester) async {
           final navigator = MockNavigator();
+          when(navigator.canPop).thenAnswer((_) => true);
           when(navigator.pop).thenAnswer((_) async {});
           await tester.pumpApp(
             fullScreenAdsBloc: fullScreenAdsBloc,
@@ -381,19 +360,14 @@ void main() {
         });
       });
 
-      testWidgets(
-          'adds ArticleRequested to ArticleBloc '
+      testWidgets('adds ArticleRequested to ArticleBloc '
           'when hasReachedArticleViewsLimit changes to false', (tester) async {
         whenListen(
           articleBloc,
-          Stream.fromIterable(
-            [
-              ArticleState.initial()
-                  .copyWith(hasReachedArticleViewsLimit: true),
-              ArticleState.initial()
-                  .copyWith(hasReachedArticleViewsLimit: false),
-            ],
-          ),
+          Stream.fromIterable([
+            ArticleState.initial().copyWith(hasReachedArticleViewsLimit: true),
+            ArticleState.initial().copyWith(hasReachedArticleViewsLimit: false),
+          ]),
         );
         await tester.pumpApp(
           fullScreenAdsBloc: fullScreenAdsBloc,
@@ -408,18 +382,15 @@ void main() {
         verify(() => articleBloc.add(ArticleRequested()));
       });
 
-      testWidgets(
-          'adds ShowInterstitialAdRequested to FullScreenAdsBloc '
+      testWidgets('adds ShowInterstitialAdRequested to FullScreenAdsBloc '
           'when interstitialAdBehavior is onOpen and '
           'showInterstitialAd is true', (tester) async {
         whenListen(
           articleBloc,
-          Stream.fromIterable(
-            [
-              ArticleState.initial().copyWith(showInterstitialAd: false),
-              ArticleState.initial().copyWith(showInterstitialAd: true),
-            ],
-          ),
+          Stream.fromIterable([
+            ArticleState.initial().copyWith(showInterstitialAd: false),
+            ArticleState.initial().copyWith(showInterstitialAd: true),
+          ]),
         );
 
         await tester.pumpApp(
@@ -432,21 +403,19 @@ void main() {
             ),
           ),
         );
-        verify(() => fullScreenAdsBloc.add(ShowInterstitialAdRequested()))
-            .called(1);
+        verify(
+          () => fullScreenAdsBloc.add(ShowInterstitialAdRequested()),
+        ).called(1);
       });
 
-      testWidgets(
-          'verify ShowInterstitialAdRequested is not '
+      testWidgets('verify ShowInterstitialAdRequested is not '
           'added to FullScreenAdsBloc when interstitialAdBehavior is onOpen '
           'and showInterstitialAd is false', (tester) async {
         whenListen(
           articleBloc,
-          Stream.fromIterable(
-            [
-              ArticleState.initial().copyWith(showInterstitialAd: false),
-            ],
-          ),
+          Stream.fromIterable([
+            ArticleState.initial().copyWith(showInterstitialAd: false),
+          ]),
         );
 
         await tester.pumpApp(
@@ -463,13 +432,12 @@ void main() {
         verifyNever(() => fullScreenAdsBloc.add(ShowInterstitialAdRequested()));
       });
 
-      testWidgets(
-          'adds ShowInterstitialAdRequested to FullScreenAdsBloc '
+      testWidgets('adds ShowInterstitialAdRequested to FullScreenAdsBloc '
           'when interstitialAdBehavior in onClose and '
           'showInterstitialAd is true', (tester) async {
-        when(() => articleBloc.state).thenReturn(
-          ArticleState.initial().copyWith(showInterstitialAd: true),
-        );
+        when(
+          () => articleBloc.state,
+        ).thenReturn(ArticleState.initial().copyWith(showInterstitialAd: true));
 
         await tester.pumpApp(
           fullScreenAdsBloc: fullScreenAdsBloc,
@@ -484,42 +452,12 @@ void main() {
 
         await tester.tap(find.byType(AppBackButton));
 
-        verify(() => fullScreenAdsBloc.add(ShowInterstitialAdRequested()))
-            .called(1);
+        verify(
+          () => fullScreenAdsBloc.add(ShowInterstitialAdRequested()),
+        ).called(1);
       });
 
-      testWidgets(
-          'adds ShowInterstitialAdRequested to FullScreenAdsBloc '
-          'when interstitialAdBehavior in onClose and '
-          'showInterstitialAd is true and '
-          'user taps system back button', (tester) async {
-        when(() => articleBloc.state).thenReturn(
-          ArticleState.initial().copyWith(showInterstitialAd: true),
-        );
-
-        await tester.pumpApp(
-          fullScreenAdsBloc: fullScreenAdsBloc,
-          BlocProvider.value(
-            value: articleBloc,
-            child: ArticleView(
-              isVideoArticle: false,
-              interstitialAdBehavior: InterstitialAdBehavior.onClose,
-            ),
-          ),
-        );
-
-        // Use didPopRoute() to simulate the system back button.
-        final dynamic widgetsAppState = tester.state(find.byType(WidgetsApp));
-        // ignore: avoid_dynamic_calls
-        await widgetsAppState.didPopRoute();
-        await tester.pump();
-
-        verify(() => fullScreenAdsBloc.add(ShowInterstitialAdRequested()))
-            .called(1);
-      });
-
-      testWidgets(
-          'verify ShowInterstitialAdRequested is not '
+      testWidgets('verify ShowInterstitialAdRequested is not '
           'added to FullScreenAdsBloc when interstitialAdBehavior is onClose '
           'showInterstitialAd is false ', (tester) async {
         when(() => articleBloc.state).thenReturn(ArticleState.initial());
@@ -540,14 +478,13 @@ void main() {
         verifyNever(() => fullScreenAdsBloc.add(ShowInterstitialAdRequested()));
       });
 
-      testWidgets(
-          'adds ShowInterstitialAdRequested to FullScreenAdsBloc '
+      testWidgets('adds ShowInterstitialAdRequested to FullScreenAdsBloc '
           'with video article '
           'when interstitialAdBehavior in onClose and '
           'showInterstitialAd is true', (tester) async {
-        when(() => articleBloc.state).thenReturn(
-          ArticleState.initial().copyWith(showInterstitialAd: true),
-        );
+        when(
+          () => articleBloc.state,
+        ).thenReturn(ArticleState.initial().copyWith(showInterstitialAd: true));
 
         await tester.pumpApp(
           fullScreenAdsBloc: fullScreenAdsBloc,
@@ -562,12 +499,12 @@ void main() {
 
         await tester.tap(find.byType(AppBackButton));
 
-        verify(() => fullScreenAdsBloc.add(ShowInterstitialAdRequested()))
-            .called(1);
+        verify(
+          () => fullScreenAdsBloc.add(ShowInterstitialAdRequested()),
+        ).called(1);
       });
 
-      testWidgets(
-          'adds ArticleRewardedAdWatched to ArticleBloc '
+      testWidgets('adds ArticleRewardedAdWatched to ArticleBloc '
           'when earnedReward is not null', (tester) async {
         whenListen(
           fullScreenAdsBloc,

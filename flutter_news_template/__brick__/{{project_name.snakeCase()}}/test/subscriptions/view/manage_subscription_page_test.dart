@@ -26,10 +26,10 @@ void main() {
   group('ManageSubscriptionView', () {
     final appBloc = MockAppBloc();
 
-    testWidgets(
-        'navigates back '
+    testWidgets('navigates back '
         'when subscriptions ListTile tapped', (tester) async {
       final navigator = MockNavigator();
+      when(navigator.canPop).thenAnswer((_) => true);
       when(navigator.maybePop).thenAnswer((_) async => true);
 
       await tester.pumpApp(

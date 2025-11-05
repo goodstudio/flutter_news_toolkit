@@ -19,32 +19,23 @@ void main() {
   const subscription = Subscription(
     id: 'dd339fda-33e9-49d0-9eb5-0ccb77eb760f',
     name: SubscriptionPlan.premium,
-    cost: SubscriptionCost(
-      annual: 16200,
-      monthly: 1499,
-    ),
-    benefits: [
-      'first',
-      'second',
-      'third',
-    ],
+    cost: SubscriptionCost(annual: 16200, monthly: 1499),
+    benefits: ['first', 'second', 'third'],
   );
 
   setUp(() {
     inAppPurchaseRepository = MockInAppPurchaseRepository();
     userRepository = MockUserRepository();
 
-    when(() => inAppPurchaseRepository.purchaseUpdate).thenAnswer(
-      (_) => const Stream.empty(),
-    );
-
-    when(inAppPurchaseRepository.fetchSubscriptions).thenAnswer(
-      (_) async => [],
-    );
+    when(
+      () => inAppPurchaseRepository.purchaseUpdate,
+    ).thenAnswer((_) => const Stream.empty());
 
     when(
-      userRepository.updateSubscriptionPlan,
-    ).thenAnswer((_) async {});
+      inAppPurchaseRepository.fetchSubscriptions,
+    ).thenAnswer((_) async => []);
+
+    when(userRepository.updateSubscriptionPlan).thenAnswer((_) async {});
   });
 
   group('showPurchaseSubscriptionDialog', () {
@@ -71,16 +62,15 @@ void main() {
   });
 
   group('PurchaseSubscriptionDialog', () {
-    testWidgets(
-      'renders PurchaseSubscriptionDialogView',
-      (WidgetTester tester) async {
-        await tester.pumpApp(
-          const PurchaseSubscriptionDialog(),
-          inAppPurchaseRepository: inAppPurchaseRepository,
-        );
-        expect(find.byType(PurchaseSubscriptionDialogView), findsOneWidget);
-      },
-    );
+    testWidgets('renders PurchaseSubscriptionDialogView', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpApp(
+        const PurchaseSubscriptionDialog(),
+        inAppPurchaseRepository: inAppPurchaseRepository,
+      );
+      expect(find.byType(PurchaseSubscriptionDialogView), findsOneWidget);
+    });
   });
 
   group('PurchaseSubscriptionDialogView', () {
@@ -88,25 +78,15 @@ void main() {
       const otherSubscription = Subscription(
         id: 'other_subscription_id',
         name: SubscriptionPlan.premium,
-        cost: SubscriptionCost(
-          annual: 16200,
-          monthly: 1499,
-        ),
-        benefits: [
-          'first',
-          'second',
-          'third',
-        ],
+        cost: SubscriptionCost(annual: 16200, monthly: 1499),
+        benefits: ['first', 'second', 'third'],
       );
 
-      final subscriptions = [
-        subscription,
-        otherSubscription,
-      ];
+      final subscriptions = [subscription, otherSubscription];
 
-      when(inAppPurchaseRepository.fetchSubscriptions).thenAnswer(
-        (_) async => subscriptions,
-      );
+      when(
+        inAppPurchaseRepository.fetchSubscriptions,
+      ).thenAnswer((_) async => subscriptions);
       await tester.pumpApp(
         const PurchaseSubscriptionDialog(),
         inAppPurchaseRepository: inAppPurchaseRepository,
@@ -126,7 +106,7 @@ void main() {
 
     testWidgets('closes dialog on close button tap', (tester) async {
       final navigator = MockNavigator();
-
+      when(navigator.canPop).thenAnswer((_) => true);
       when(navigator.pop).thenAnswer((_) async => true);
 
       await tester.pumpApp(
@@ -136,31 +116,28 @@ void main() {
       );
       await tester.pump();
       await tester.tap(
-        find.byKey(
-          const Key('purchaseSubscriptionDialog_closeIconButton'),
-        ),
+        find.byKey(const Key('purchaseSubscriptionDialog_closeIconButton')),
       );
       await tester.pump();
 
       verify(navigator.pop).called(1);
     });
 
-    testWidgets(
-        'shows PurchaseCompleted dialog '
+    testWidgets('shows PurchaseCompleted dialog '
         'and adds UserSubscriptionConversionEvent to AnalyticsBloc '
-        'when SubscriptionsBloc emits purchaseStatus.completed',
-        (tester) async {
+        'when SubscriptionsBloc emits purchaseStatus.completed', (
+      tester,
+    ) async {
       final navigator = MockNavigator();
       final analyticsBloc = MockAnalyticsBloc();
 
+      when(navigator.canPop).thenAnswer((_) => true);
       when(navigator.maybePop<void>).thenAnswer((_) async => true);
 
-      when(
-        () => inAppPurchaseRepository.purchaseUpdate,
-      ).thenAnswer(
-        (_) => Stream.fromIterable(
-          [const PurchaseDelivered(subscription: subscription)],
-        ),
+      when(() => inAppPurchaseRepository.purchaseUpdate).thenAnswer(
+        (_) => Stream.fromIterable([
+          const PurchaseDelivered(subscription: subscription),
+        ]),
       );
 
       await tester.pumpApp(
@@ -171,14 +148,13 @@ void main() {
         userRepository: userRepository,
       );
 
-      await tester.pump();
       expect(find.byType(PurchaseCompletedDialog), findsOneWidget);
+
+      await tester.pump(const Duration(seconds: 3));
 
       verify(
         () => analyticsBloc.add(
-          TrackAnalyticsEvent(
-            UserSubscriptionConversionEvent(),
-          ),
+          TrackAnalyticsEvent(UserSubscriptionConversionEvent()),
         ),
       ).called(1);
     });

@@ -13,6 +13,7 @@ class CategoriesTabBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return TabBar(
+      tabAlignment: TabAlignment.start,
       controller: controller,
       isScrollable: true,
       tabs: tabs,
@@ -24,11 +25,7 @@ class CategoriesTabBar extends StatelessWidget implements PreferredSizeWidget {
 }
 
 class CategoryTab extends StatelessWidget {
-  const CategoryTab({
-    required this.categoryName,
-    this.onDoubleTap,
-    super.key,
-  });
+  const CategoryTab({required this.categoryName, this.onDoubleTap, super.key});
 
   final String categoryName;
   final VoidCallback? onDoubleTap;

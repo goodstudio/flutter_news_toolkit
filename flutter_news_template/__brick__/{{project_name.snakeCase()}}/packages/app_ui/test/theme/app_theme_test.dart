@@ -7,10 +7,7 @@ void main() {
     group('themeData', () {
       group('color', () {
         test('primary is blue', () {
-          expect(
-            const AppTheme().themeData.primaryColor,
-            AppColors.blue,
-          );
+          expect(const AppTheme().themeData.primaryColor, AppColors.blue);
         });
 
         test('secondary is AppColors.secondary', () {
@@ -23,10 +20,7 @@ void main() {
 
       group('divider', () {
         test('horizontal padding is AppSpacing.lg', () {
-          expect(
-            const AppTheme().themeData.dividerTheme.indent,
-            AppSpacing.lg,
-          );
+          expect(const AppTheme().themeData.dividerTheme.indent, AppSpacing.lg);
           expect(
             const AppTheme().themeData.dividerTheme.endIndent,
             AppSpacing.lg,
@@ -34,10 +28,7 @@ void main() {
         });
 
         test('space is AppSpacing.lg', () {
-          expect(
-            const AppTheme().themeData.dividerTheme.space,
-            AppSpacing.lg,
-          );
+          expect(const AppTheme().themeData.dividerTheme.space, AppSpacing.lg);
         });
       });
 
@@ -45,11 +36,9 @@ void main() {
         group('thumbColor', () {
           test('returns darkAqua when selected', () {
             expect(
-              const AppTheme()
-                  .themeData
-                  .switchTheme
-                  .thumbColor
-                  ?.resolve({MaterialState.selected}),
+              const AppTheme().themeData.switchTheme.thumbColor?.resolve({
+                WidgetState.selected,
+              }),
               equals(AppColors.darkAqua),
             );
           });
@@ -65,19 +54,37 @@ void main() {
         group('trackColor', () {
           test('returns primaryContainer when selected', () {
             expect(
-              const AppTheme()
-                  .themeData
-                  .switchTheme
-                  .trackColor
-                  ?.resolve({MaterialState.selected}),
+              const AppTheme().themeData.switchTheme.trackColor?.resolve({
+                WidgetState.selected,
+              }),
               equals(AppColors.primaryContainer),
             );
           });
 
-          test('returns paleSky when not selected', () {
+          test('returns grey when not selected', () {
             expect(
               const AppTheme().themeData.switchTheme.trackColor?.resolve({}),
-              equals(AppColors.paleSky),
+              equals(AppColors.grey),
+            );
+          });
+        });
+
+        group('trackOutlineColor', () {
+          test('returns primaryContainer when selected', () {
+            expect(
+              const AppTheme().themeData.switchTheme.trackOutlineColor?.resolve(
+                {WidgetState.selected},
+              ),
+              equals(AppColors.primaryContainer),
+            );
+          });
+
+          test('returns grey when not selected', () {
+            expect(
+              const AppTheme().themeData.switchTheme.trackOutlineColor?.resolve(
+                {},
+              ),
+              equals(AppColors.grey),
             );
           });
         });
@@ -108,10 +115,7 @@ void main() {
     group('themeData', () {
       group('color', () {
         test('primary is blue', () {
-          expect(
-            const AppDarkTheme().themeData.primaryColor,
-            AppColors.blue,
-          );
+          expect(const AppDarkTheme().themeData.primaryColor, AppColors.blue);
         });
 
         test('secondary is AppColors.secondary', () {
@@ -123,7 +127,7 @@ void main() {
 
         test('background is grey.shade900', () {
           expect(
-            const AppDarkTheme().themeData.colorScheme.background,
+            const AppDarkTheme().themeData.colorScheme.surface,
             AppColors.grey.shade900,
           );
         });
@@ -131,10 +135,7 @@ void main() {
 
       group('divider', () {
         test('horizontal padding is AppSpacing.lg', () {
-          expect(
-            const AppTheme().themeData.dividerTheme.indent,
-            AppSpacing.lg,
-          );
+          expect(const AppTheme().themeData.dividerTheme.indent, AppSpacing.lg);
           expect(
             const AppTheme().themeData.dividerTheme.endIndent,
             AppSpacing.lg,
@@ -142,10 +143,7 @@ void main() {
         });
 
         test('space is AppSpacing.lg', () {
-          expect(
-            const AppTheme().themeData.dividerTheme.space,
-            AppSpacing.lg,
-          );
+          expect(const AppTheme().themeData.dividerTheme.space, AppSpacing.lg);
         });
       });
     });
